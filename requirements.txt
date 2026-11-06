@@ -1,0 +1,27 @@
+# Core Framework & UI
+streamlit>=1.39.0
+
+# Database & ORM
+sqlalchemy>=2.0.30
+
+# Validation & Settings
+pydantic>=2.7.0
+pydantic-settings>=2.2.0
+python-dotenv>=1.0.0
+
+# Document Ingestion & Parsers
+pdfplumber>=0.11.0
+pypdf>=4.2.0
+python-docx>=1.1.0
+openpyxl>=3.1.2
+
+# Data Processing & Visualization
+pandas>=2.2.0
+plotly>=5.22.0
+xlsxwriter>=3.2.0
+reportlab>=4.2.0
+
+# AI / LLM & HTTP Client
+httpx>=0.27.0
+openai>=1.30.0
+
