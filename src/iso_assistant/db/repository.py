@@ -49,6 +49,11 @@ class DocumentRepository:
         )
 
     @staticmethod
+    def find_by_id(db: Session, document_id: str) -> Document | None:
+        """Finds a document by its primary key ID."""
+        return db.query(Document).filter(Document.id == document_id).first()
+
+    @staticmethod
     def save_document(db: Session, document: Document) -> Document:
         """Persists ingested document metadata and extracted text."""
         db.add(document)
@@ -60,6 +65,16 @@ class DocumentRepository:
     def list_project_documents(db: Session, project_id: str) -> list[Document]:
         """Lists all uploaded documents for a project."""
         return db.query(Document).filter(Document.project_id == project_id).all()
+
+    @staticmethod
+    def delete_document(db: Session, document_id: str) -> bool:
+        """Removes a document from the database by its ID."""
+        doc = db.query(Document).filter(Document.id == document_id).first()
+        if doc:
+            db.delete(doc)
+            db.commit()
+            return True
+        return False
 
 
 class ControlRepository:

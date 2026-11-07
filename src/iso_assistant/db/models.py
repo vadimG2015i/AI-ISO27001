@@ -13,6 +13,7 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
+    UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 
@@ -53,15 +54,24 @@ class Document(Base):
     """Metadata and extracted content of uploaded compliance documents."""
 
     __tablename__ = "documents"
+    __table_args__ = (
+        # Enforce per-project document deduplication at the database level.
+        # Prevents duplicate inserts even under concurrent uploads (race condition guard).
+        UniqueConstraint("project_id", "file_hash", name="uq_document_project_hash"),
+    )
 
     id = Column(String(36), primary_key=True, default=generate_uuid)
     project_id = Column(String(36), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
     filename = Column(String(255), nullable=False)
+    stored_path = Column(String(512), nullable=True)  # Safe stored filename or storage reference
     file_type = Column(String(16), nullable=False)  # PDF, DOCX, XLSX
+    file_extension = Column(String(16), nullable=True)  # .pdf, .docx, .xlsx
     file_hash = Column(String(64), nullable=False, index=True)  # SHA-256
     file_size_bytes = Column(Integer, nullable=False)
+    extraction_status = Column(String(32), nullable=False, default="SUCCESS")  # SUCCESS, EMPTY, FAILED, DUPLICATE
     raw_text = Column(Text, nullable=True)
     extracted_metadata = Column(Text, nullable=True)  # JSON-serialized metadata
+    processing_error = Column(Text, nullable=True)  # Detailed error trace or failure reason if any
     uploaded_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
 
     project = relationship("Project", back_populates="documents")
